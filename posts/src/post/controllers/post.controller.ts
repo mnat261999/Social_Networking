@@ -45,8 +45,6 @@ export class PostController {
                 return res.status(HttpStatus.BAD_REQUEST).json({msg:result.message});
             else if(result.isSuccess==true) 
                 return res.status(HttpStatus.OK).json({msg:result.message});
-            else 
-                return result
         } catch (err) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
         }
@@ -54,12 +52,14 @@ export class PostController {
 
     @UseGuards(JwtGuard)
     @Put('update_image/:id')
-    async updatePostImage(@Param('id') id:string,@Body() media:MediaDto,@Res() res){
+    async updatePostImage(@Param('id') id:string,@Body() media:MediaDto,@Res() res,@Request() req){
         try {
             
-            const result = await this.postService.updatePostImage(id,media)
+            const result = await this.postService.updatePostImage(id,media,req.user)
             if(result.isSuccess==true) 
-                    return res.status(HttpStatus.OK).json({msg:result.message});
+                    return res.status(HttpStatus.OK).json({msg:result.message})
+            else if(result.isSuccess==false) 
+                    return res.status(HttpStatus.BAD_REQUEST).json({msg:result.message});
         } catch (err) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
         }

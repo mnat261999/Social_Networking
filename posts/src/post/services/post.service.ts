@@ -66,13 +66,13 @@ export class PostService {
     }
 
     async updatePostContent(idPost:string, post:Posts,user:any){
-        const postUpdate = await this.postRespository.findOne({idPost})
-        
-        if(postUpdate.idUser!= user.idUser)
-            return{
-                isSuccess: false,
-                message: 'You can only edit posts created by you'
-            }
+        const result = await this.validateUserPost(idPost,user)
+
+        if(result.isCheck == false) return{
+            isSuccess: false,
+            message: 'You can only edit posts created by you'
+        }
+
 
         await this.postRespository
                   .createQueryBuilder()
@@ -86,7 +86,14 @@ export class PostService {
         }
     }
 
-    async updatePostImage(idPost:any, medias:Medias){
+    async updatePostImage(idPost:any, medias:Medias, user:any){
+
+        const result = await this.validateUserPost(idPost,user)
+
+        if(result.isCheck == false) return{
+            isSuccess: false,
+            message: 'You can only edit posts created by you'
+        }
 
         const {media,typeMedia} = medias
 
@@ -106,7 +113,6 @@ export class PostService {
 
     async deletePost(idPost:string,user:any){
 
-        console.log(idPost)
         const result = await this.validateUserPost(idPost,user)
 
         if(result.isCheck == false) return{
