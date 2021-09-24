@@ -11,7 +11,7 @@ export class FollowsService {
     ){}
 
 
-    async checkUser(idUser:any, idFollower:any){
+    async checkFollow(idUser:any, idFollower:any){
         const check = await this.followRespository.createQueryBuilder('follow')
                                                   .where('follow.idUser = :idUser', {idUser})
                                                   .andWhere('follow.idFollower = :idFollower', {idFollower})
@@ -29,7 +29,7 @@ export class FollowsService {
     
     async follow(idUser:any, idFollower:any){
     
-        const result = await this.checkUser(idUser,idFollower)
+        const result = await this.checkFollow(idUser,idFollower)
         if(result.isCheck == false) return{
             isSuccess: false,
             message:result.message
@@ -46,15 +46,39 @@ export class FollowsService {
       
     }
 
-    async getFollowingByUser(idUser:any){
+    async getListFollowByUser(idUser:any){
         const following = await this.followRespository.createQueryBuilder('following')
                                                       .leftJoinAndSelect("following.idFollower", "user")
                                                       .where('following.idUser = :idUser', {idUser})
                                                       .select(['following','user'])
                                                       .getMany();
+        const follower = await this.followRespository.createQueryBuilder('following')
+                                                     .leftJoinAndSelect("following.idUser", "user")
+                                                     .where('following.idFollower = :idUser', {idUser})
+                                                     .select(['following','user'])
+                                                     .getMany();
         return{
             isSuccess: true,
-            following: following
+            following: following,
+            totalFollowing:following.length,
+            follower:follower,
+            totalFollower:follower.length,
+        }
+    }
+
+    async cancelFollow(idUser:any, idFollowCancel:any){
+        const follow = await this.followRespository.createQueryBuilder('follow')
+                                                   .where('follow.idUser = :idUser', {idUser})
+                                                   .andWhere('follow.idFollower = :idFollowCancel',{idFollowCancel})
+                                                   .getOne()
+        const idFollow = follow.idFollow
+        await this.followRespository.createQueryBuilder()
+                                    .delete()
+                                    .where("idFollow = :idFollow",{idFollow})
+                                    .execute()
+        return{
+            isSuccess: true,
+            message:'Unfollow successful'
         }
     }
 }

@@ -1,23 +1,32 @@
 import {
     Column,
+    CreateDateColumn,
     Entity,
     ManyToOne,
-    OneToMany,
     PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 
 import { PostEntity } from './post.entity';
 
 @Entity()
-  export class ImageEntity {
+  export class LikeEntity {
 
     @PrimaryGeneratedColumn("uuid")
-    idImage: string;
+    idLike: string;
     
+    @Column()
+    idUserCreator: string;
+
     @ManyToOne(() => PostEntity, post => post.idPost)
     idPost: PostEntity;
 
-    @Column('simple-json', { default: null })
-    image: {};
+    @Column()
+    @CreateDateColumn()
+    createdAt: Date;
+  
+    @Column()
+    @UpdateDateColumn()
+    updatedAt: Date; 
 
 }

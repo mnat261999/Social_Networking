@@ -1,4 +1,4 @@
-import { Controller, Param, Post, Res, Request, UseGuards, HttpStatus, Get } from '@nestjs/common';
+import { Controller, Param, Post, Res, Request, UseGuards, HttpStatus, Get, Delete } from '@nestjs/common';
 import { JwtGuard } from '../guards/jwt.guard';
 import { FollowsService } from '../services/follows.service';
 
@@ -10,6 +10,7 @@ export class FollowsController {
     @Post(':id')
     async follow(@Param('id') id:string, @Res() res,@Request() req){
         try {
+            console.log(req.user)
             const result = await this.followService.follow(req.user.idUser,id)
             if(result.isSuccess==true) 
                 return res.status(HttpStatus.OK).json({newFollow:result.newFollow})
@@ -24,9 +25,26 @@ export class FollowsController {
     @Get('following_list')
     async listFollowing(@Res() res,@Request() req){
         try {
-            const result = await this.followService.getFollowingByUser(req.user.idUser)
+            const result = await this.followService.getListFollowByUser(req.user.idUser)
             if(result.isSuccess==true) 
-                return res.status(HttpStatus.OK).json({following:result.following})
+                return res.status(HttpStatus.OK).json({
+                    following:result.following,
+                    totalFollowing:result.totalFollowing,
+                    follower:result.follower,
+                    totalFollower:result.totalFollower
+                })
+        } catch (err) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
+        }
+    }
+
+    @UseGuards(JwtGuard)
+    @Delete('unfollow/:id')
+    async unFollow(@Param('id') id:string, @Res() res,@Request() req){
+        try {
+            const result = await this.followService.cancelFollow(req.user.idUser,id)
+            if(result.isSuccess==true) 
+                return res.status(HttpStatus.OK).json({msg:result.message})
         } catch (err) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
         }

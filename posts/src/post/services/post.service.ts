@@ -1,24 +1,63 @@
+import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { MediaEntity } from '../models/entity/media.entity';
 import { PostEntity } from '../models/entity/post.entity';
+import { Medias } from '../models/interface/media.interface';
 import { Posts } from '../models/interface/post.interface';
 
 @Injectable()
 export class PostService {
-    constructor(@InjectRepository(PostEntity) private readonly postRespository:Repository<PostEntity>){}
+    constructor(
+        @InjectRepository(PostEntity) private readonly postRespository:Repository<PostEntity>,
+        @InjectRepository(MediaEntity) private readonly mediaRespository:Repository<MediaEntity>,
+        private httpService: HttpService
+        ){}
+    
+    async addImage(idPost:any,media:any,typeMedia:string){
+        const newMedia = {
+            idPost:idPost,media,typeMedia
+        }
+
+        await this.mediaRespository.save(newMedia)
+    }
+    
+
+    async validateUserPost(idPost:string,user:any){
+        const postCheck = await this.postRespository.findOne({idPost})
+        console.log(postCheck)
+        if(postCheck.idUser!= user.idUser)
+            return{isCheck: false}
+        else 
+            return{
+                isCheck:true,
+                idPost:postCheck.idPost
+            }
+    }
+
 
     async createPost(post:Posts,user:any){
-        const {content} = post
+        console.log(post)
+        const {content,media,typeMedia} = post
 
         const newPost:any = {
             content,idUser:user.idUser
         }
-        await this.postRespository.save(newPost)
+        const savePost = await this.postRespository.save(newPost)
+
+        if(media != undefined){
+            await this.addImage(savePost.idPost,media,typeMedia)
+/*             const newMedia = {
+                idPost:savePost.idPost,media,typeMedia
+            }
+    
+            await this.mediaRespository.save(newMedia) */
+        }
         return{
             isSuccess:true,
             message:'Create success',
-            newPost
+            newPost:savePost
         }
     }
 
@@ -26,7 +65,7 @@ export class PostService {
         return await this.postRespository.find()
     }
 
-    async updatePost(idPost:string, post:Posts,user:any){
+    async updatePostContent(idPost:string, post:Posts,user:any){
         const postUpdate = await this.postRespository.findOne({idPost})
         
         if(postUpdate.idUser!= user.idUser)
@@ -47,18 +86,71 @@ export class PostService {
         }
     }
 
-    async deletePost(idPost:string,user:any){
-        const postDelete = await this.postRespository.findOne({idPost})
-        
-        if(postDelete.idUser!= user.idUser)
-            return{
-                isSuccess: false,
-                message: 'You can only delete posts created by you'
-            }
-        await this.postRespository.delete(idPost)
+    async updatePostImage(idPost:any, medias:Medias){
+
+        const {media,typeMedia} = medias
+
+        await this.addImage(idPost,media,typeMedia)
+
+        await this.postRespository
+                  .createQueryBuilder()
+                  .update()
+                  .set({updatedAt:Date.now()})
+                  .where("idPost = :idPost", {idPost})
+                  .execute();
         return{
-             isSuccess: true,
-             message: 'Delete success'
-         }
-     }
+            isSuccess: true,
+            message: 'Update success'
+        }
+    }
+
+    async deletePost(idPost:string,user:any){
+
+        console.log(idPost)
+        const result = await this.validateUserPost(idPost,user)
+
+        if(result.isCheck == false) return{
+            isSuccess: false,
+            message: 'You can only delete posts created by you'
+        }
+        else
+            await this.postRespository.delete(result.idPost)
+            return{
+                isSuccess: true,
+                message: 'Delete success'
+            }
+    }
+
+    async groupPostByUser(idUser:string){
+        
+        const listPosts = await this.postRespository.createQueryBuilder('post')
+                                                    .leftJoinAndSelect('post.medias','media')
+                                                    .where('post.idUser = :idUser',{idUser})
+                                                    .select(['post','media'])
+                                                    .getMany()
+            
+            return{
+                isSuccess: true,
+                listPosts: listPosts
+            }
+                                                    
+    }
+
+    async getPostById(idPost:string): Promise<any>{
+        console.log(idPost)
+        const post = await this.postRespository.createQueryBuilder('post')
+                                               .leftJoinAndSelect('post.medias','media')
+                                               .where('post.idPost = :idPost',{idPost})
+                                               .select(['post','media'])
+                                               .getOne()
+
+          
+        const userCreator = await this.httpService.get(`http://localhost:2000/user/get_id/${post.idUser}`).toPromise()                                       
+        
+        return{
+            isSuccess: true,
+            post:post,
+            userCreator:userCreator.data.userInfor
+        }
+    }
 }

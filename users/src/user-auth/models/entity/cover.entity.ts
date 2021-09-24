@@ -20,4 +20,7 @@ import { UserEntity } from './user.entity';
     @Column('simple-json', { default: null })
     cover: {};
 
+    @Column({ default: true })
+    checkNow:boolean
+
 }

@@ -13,6 +13,10 @@ import { NotificationEntity } from './models/entity/notification.entity';
 import { FollowEntity } from './models/entity/follow.entity';
 import { FollowsService } from './services/follows.service';
 import { FollowsController } from './controllers/follows.controller';
+import { AvatarService } from './services/avatar.service';
+import { UploadService } from './services/upload.service';
+import { UploadController } from './controllers/upload.controller';
+import { AvatarController } from './controllers/avatar.controller';
 
 
 
@@ -28,7 +32,7 @@ import { FollowsController } from './controllers/follows.controller';
       })
     }),
   ], 
-  providers: [UserAuthService,JwtGuard, JwtStrategy, FollowsService],
-  controllers: [UserAuthController, FollowsController]
+  providers: [UserAuthService,JwtGuard, JwtStrategy, FollowsService, AvatarService, UploadService],
+  controllers: [UserAuthController, FollowsController, UploadController, AvatarController]
 })
 export class UserAuthModule {}

@@ -1,8 +1,8 @@
 import {
     Column,
+    CreateDateColumn,
     Entity,
     ManyToOne,
-    PrimaryColumn,
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
@@ -20,5 +20,12 @@ import { UserEntity } from './user.entity';
 
     @Column('simple-json', { default: null })
     avatar: {};
+
+    @Column({ default: true })
+    checkNow: boolean;
+
+    @Column()
+    @CreateDateColumn()
+    createdAt: Date;
 
 }

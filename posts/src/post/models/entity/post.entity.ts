@@ -2,9 +2,11 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn
   } from 'typeorm';
+import { MediaEntity } from './media.entity';
 
 
   @Entity()
@@ -18,7 +20,12 @@ import {
     @Column()
     idUser: string;
 
+    @Column("simple-array", { default: null})
+    reply: []
 
+    @OneToMany(type => MediaEntity, media => media.idPost)
+    medias: MediaEntity[];
+    
     @Column()
     @CreateDateColumn()
     createdAt: Date;

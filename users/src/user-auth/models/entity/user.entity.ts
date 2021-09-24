@@ -31,7 +31,7 @@ export class UserEntity{
     role: Role;
 
 
-    @OneToMany(type => AvatarEntity, ava => ava.avatar)
+    @OneToMany(type => AvatarEntity, ava => ava.idUser)
     avas: AvatarEntity[];
 
     @OneToMany(type => CoverEntity, cover => cover.cover)

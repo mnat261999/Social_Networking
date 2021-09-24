@@ -125,18 +125,21 @@ export class UserAuthService {
         }
 
         async getUserInfor(idUser:string){
-          console.log(idUser)
-          const userInfor = await this.userRespository.createQueryBuilder('user')
-                                                      .leftJoinAndSelect('user.follower', 'follower')
-                                                      .leftJoinAndSelect('user.following', 'following')
-                                                      .where('following.idFollower = :idUser',{idUser})
-                                                      .orWhere('follower.idFollowing = :idUser',{idUser})
-                                                      .getOne()
+/*           const userInfor = await this.userRespository.findOne({
+            select: ['idUser','firstName','lastName', 'email','phone', 'password', 'role', 'createdAt','updatedAt'],
+            where: {idUser:idUser},
+          }) */
 
-        return {
-          isSuccess: true,
-          userInfor: userInfor
-        }
+          const userInfor = await this.userRespository.createQueryBuilder('user')
+                                                      .leftJoinAndSelect('user.avas','ava')
+                                                      .where('user.idUser = :idUser', {idUser})
+                                                      .select(['user.idUser','user.firstName','user.lastName','user.email','user.phone','user.password','user.role','user.createdAt','user.updatedAt','ava'])
+                                                      .getOne()
+    
+          return {
+            isSuccess: true,
+            userInfor: userInfor
+          }
     
         }
 }

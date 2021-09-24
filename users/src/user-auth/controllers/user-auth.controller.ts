@@ -28,7 +28,7 @@ export class UserAuthController {
         }
     }
     @Post('login')
-    async login(@Body() user:any,@Res() res:Response){
+    async login(@Body() user:any,@Res() res:Response,@Request() req){
         const result:any = await this.userService.login(user)
 
         if(result.isCheck== false){
@@ -37,6 +37,8 @@ export class UserAuthController {
             res.cookie('tokenauthen',result.token,{
                 httpOnly:true
             })
+
+            
             res.status(HttpStatus.OK).json({
                 msg: result.message,
                 token:result.token
@@ -72,7 +74,7 @@ export class UserAuthController {
     async findAll(@Res() res){
         try {
             const result = await this.userService.findAll()
-            if(result.isSuccess) return res.status(HttpStatus.OK).json({msg:result.users})
+            if(result.isSuccess) return res.status(HttpStatus.OK).json({userList:result.users})
         } catch (err) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
         }
@@ -82,6 +84,7 @@ export class UserAuthController {
     @Get('infor')
     async getUserInfor(@Request() req,@Res() res){
         try {
+            
             const result = await this.userService.getUserInfor(req.user.idUser)
             if(result.isSuccess) return res.status(HttpStatus.OK).json({
                 userInfor:result.userInfor
@@ -92,4 +95,15 @@ export class UserAuthController {
     }
 
 
+    @Get('get_id/:id')
+    async getUserId(@Param('id') id:string, @Res() res){
+        try {
+            const result = await this.userService.getUserInfor(id)
+            if(result.isSuccess) return res.status(HttpStatus.OK).json({
+                userInfor:result.userInfor
+            })
+        } catch (err) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
+        }
+    }
 }
