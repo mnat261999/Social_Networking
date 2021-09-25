@@ -15,7 +15,7 @@ export class PostService {
         private httpService: HttpService
         ){}
     
-    async addImage(idPost:any,media:any,typeMedia:string){
+    async addMedia(idPost:any,media:any,typeMedia:string){
         const newMedia = {
             idPost:idPost,media,typeMedia
         }
@@ -47,7 +47,7 @@ export class PostService {
         const savePost = await this.postRespository.save(newPost)
 
         if(media != undefined){
-            await this.addImage(savePost.idPost,media,typeMedia)
+            await this.addMedia(savePost.idPost,media,typeMedia)
 /*             const newMedia = {
                 idPost:savePost.idPost,media,typeMedia
             }
@@ -86,7 +86,7 @@ export class PostService {
         }
     }
 
-    async updatePostImage(idPost:any, medias:Medias, user:any){
+    async updatePostMedia(idPost:any, medias:Medias, user:any){
 
         const result = await this.validateUserPost(idPost,user)
 
@@ -97,12 +97,14 @@ export class PostService {
 
         const {media,typeMedia} = medias
 
-        await this.addImage(idPost,media,typeMedia)
+        await this.addMedia(idPost,media,typeMedia)
+
+        const dateTime = new Date ();
 
         await this.postRespository
                   .createQueryBuilder()
                   .update()
-                  .set({updatedAt:Date.now()})
+                  .set({updatedAt:dateTime})
                   .where("idPost = :idPost", {idPost})
                   .execute();
         return{
@@ -125,6 +127,41 @@ export class PostService {
                 isSuccess: true,
                 message: 'Delete success'
             }
+    }
+
+    async deletePostMedia(idMedia:string,user:any){
+    
+        const media = await this.mediaRespository.findOne({
+            select: ['idMedia','media', 'typeMedia'],
+            where: {idMedia:idMedia},
+            relations:['idPost']
+        })
+
+        const idPost = media.idPost.idPost
+
+        const result = await this.validateUserPost(idPost,user)
+
+        if(result.isCheck == false) return{
+            isSuccess: false,
+            message: 'You can only delete media created by you'
+        }
+
+        await this.mediaRespository.delete(media)
+
+        const dateTime = new Date ();
+
+        await this.postRespository
+        .createQueryBuilder()
+        .update()
+        .set({updatedAt:dateTime})
+        .where("idPost = :idPost", {idPost})
+        .execute();
+
+        return{
+            isSuccess: true,
+            message: 'Delete success'
+        }
+
     }
 
     async groupPostByUser(idUser:string){

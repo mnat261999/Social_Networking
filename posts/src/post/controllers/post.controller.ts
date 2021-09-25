@@ -51,11 +51,11 @@ export class PostController {
     }
 
     @UseGuards(JwtGuard)
-    @Put('update_image/:id')
+    @Put('update_media/:id')
     async updatePostImage(@Param('id') id:string,@Body() media:MediaDto,@Res() res,@Request() req){
         try {
             
-            const result = await this.postService.updatePostImage(id,media,req.user)
+            const result = await this.postService.updatePostMedia(id,media,req.user)
             if(result.isSuccess==true) 
                     return res.status(HttpStatus.OK).json({msg:result.message})
             else if(result.isSuccess==false) 
@@ -79,6 +79,22 @@ export class PostController {
                 return res.status(HttpStatus.BAD_REQUEST).json({msg:result.message});
             else if(result.isSuccess==true) 
                 return res.status(HttpStatus.OK).json({msg:result.message})
+        } catch (err) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
+        }
+    }
+
+    @UseGuards(JwtGuard)
+    @Delete('delete_media/:id')
+    async deleteMediaPost(@Param('id') id:string, @Res() res,@Request() req){
+        
+        try {
+            
+           const result = await this.postService.deletePostMedia(id,req.user)
+             if(result.isSuccess==false)
+                return res.status(HttpStatus.BAD_REQUEST).json({msg:result.message});
+            else if(result.isSuccess==true) 
+                return res.status(HttpStatus.OK).json({msg:result.message});
         } catch (err) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
         }
