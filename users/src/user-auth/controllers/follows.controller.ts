@@ -45,6 +45,8 @@ export class FollowsController {
             const result = await this.followService.cancelFollow(req.user.idUser,id)
             if(result.isSuccess==true) 
                 return res.status(HttpStatus.OK).json({msg:result.message})
+            else 
+                return res.status(HttpStatus.BAD_REQUEST).json({msg:result.message})
         } catch (err) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
         }

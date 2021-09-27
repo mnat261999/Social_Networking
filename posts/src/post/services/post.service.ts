@@ -168,8 +168,9 @@ export class PostService {
 
         const listPosts = await this.postRespository.createQueryBuilder('post')
             .leftJoinAndSelect('post.medias', 'media')
+            .leftJoinAndSelect('post.likes', 'like')
             .where('post.idUser = :idUser', { idUser })
-            .select(['post', 'media'])
+            .select(['post', 'media','like'])
             .getMany()
 
         return {

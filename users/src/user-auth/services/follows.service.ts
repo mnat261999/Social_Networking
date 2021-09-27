@@ -71,6 +71,11 @@ export class FollowsService {
                                                    .where('follow.idUser = :idUser', {idUser})
                                                    .andWhere('follow.idFollower = :idFollowCancel',{idFollowCancel})
                                                    .getOne()
+
+        if(follow == undefined) return {
+            isSuccess: true,
+            message:"You haven't followed this user yet"
+        }
         const idFollow = follow.idFollow
         await this.followRespository.createQueryBuilder()
                                     .delete()
