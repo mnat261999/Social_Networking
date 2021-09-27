@@ -6,18 +6,17 @@ import { JwtStrategy } from './guards/jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostEntity } from './models/entity/post.entity';
 import { MediaEntity } from './models/entity/media.entity';
-import { LikeEntity } from './models/entity/like.entity';
-import { CommentEntity } from './models/entity/comment.entity';
 import { HttpModule } from '@nestjs/axios';
 import { UploadService } from './services/upload.service';
 import { UploadController } from './controllers/upload.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PostEntity,MediaEntity,LikeEntity,CommentEntity]),
+    TypeOrmModule.forFeature([PostEntity,MediaEntity]),
     HttpModule
   ], 
   providers: [PostService,JwtGuard,JwtStrategy, UploadService],
-  controllers: [PostController, UploadController]
+  controllers: [PostController, UploadController],
+  exports: [PostService]
 })
 export class PostModule {}

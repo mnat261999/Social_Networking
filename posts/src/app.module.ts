@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PostModule } from './post/post.module';
+import { CommentModule } from './comment/comment.module';
+import { LikeModule } from './like/like.module';
 
 
 
@@ -24,7 +26,9 @@ import { PostModule } from './post/post.module';
       "autoLoadEntities": true,
       "synchronize": true
     }),
-    PostModule
+    PostModule,
+    CommentModule,
+    LikeModule
   ],
 })
 export class AppModule {}

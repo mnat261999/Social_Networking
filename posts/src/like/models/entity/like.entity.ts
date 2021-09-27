@@ -7,17 +7,14 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
-import { PostEntity } from './post.entity';
+import { PostEntity } from 'src/post/models/entity/post.entity';
 
 @Entity()
-  export class CommentEntity {
+  export class LikeEntity {
 
     @PrimaryGeneratedColumn("uuid")
-    idComment: string;
+    idLike: string;
     
-    @Column()
-    content: string;
-
     @Column()
     idUserCreator: string;
 

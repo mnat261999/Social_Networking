@@ -98,7 +98,7 @@ export class UserAuthController {
     @Get('get_id/:id')
     async getUserId(@Param('id') id:string, @Res() res){
         try {
-            const result = await this.userService.getUserInfor(id)
+            const result = await this.userService.getUserById(id)
             if(result.isSuccess) return res.status(HttpStatus.OK).json({
                 userInfor:result.userInfor
             })

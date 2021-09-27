@@ -1,3 +1,5 @@
+import { CommentEntity } from 'src/comment/models/entity/comment.entity';
+import { LikeEntity } from 'src/like/models/entity/like.entity';
 import {
     Column,
     CreateDateColumn,
@@ -25,6 +27,12 @@ import { MediaEntity } from './media.entity';
 
     @OneToMany(type => MediaEntity, media => media.idPost)
     medias: MediaEntity[];
+
+    @OneToMany(type => LikeEntity, like => like.idPost)
+    likes: LikeEntity[];
+
+    @OneToMany(type => CommentEntity, comment => comment.idPost)
+    comments: CommentEntity[];
     
     @Column()
     @CreateDateColumn()

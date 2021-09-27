@@ -24,17 +24,38 @@ export class AvatarService {
         return avaCurrent
     }
 
+    async getAvatarById(idAvatar:string){
+        const ava = await await this.avatarRespository.findOne({
+            select: ['idAvatar'],
+            where: {idAvatar:idAvatar},
+            relations:['idUser']
+          })
+        
+        return {
+            ava:ava,
+            idUserAva:ava.idUser.idUser
+        }
+    }
+
     async createAvatar(idUser:any,images:Avatar){
         const avas = await this.avatarRespository.find()
-        console.log(avas)
-        if (avas!= []){
+        
+        if (avas.length > 0){
+            console.log('test 1')
             avas.map(async _=>{
-                const id = _.idAvatar
-                if(_.checkNow = true && _.idUser==idUser){
+                
+                const idAvatar = _.idAvatar
+
+                const ava = await this.getAvatarById(idAvatar)
+
+                const idUserCurrent = ava.idUserAva
+
+                
+                if(_.checkNow = true && idUserCurrent==idUser){
                     await this.avatarRespository.createQueryBuilder()
                                                 .update()
                                                 .set({checkNow:false})
-                                                .where("idAvatar = :id",{id})
+                                                .where("idAvatar = :idAvatar",{idAvatar})
                                                 .execute()
                 }
             })

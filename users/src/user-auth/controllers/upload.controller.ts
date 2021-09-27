@@ -14,6 +14,7 @@ export class UploadController {
     @UseInterceptors(FileInterceptor('files'))
     async uploadFile(@UploadedFile() files: Express.Multer.File,@Res() res,@Request() req ) {
         try {
+          console.log(files)
           const result = await this.uploadService.uploadAvatar(files)
           if(result.isSuccess==false)
                 return res.status(HttpStatus.BAD_REQUEST).json({
