@@ -15,6 +15,13 @@ export class PostService {
         private httpService: HttpService
     ) { }
 
+
+    async getUserInfor(idUser: string): Promise<any>{
+        const user = await this.httpService.get(`http://localhost:2000/user/get_id/${idUser}`).toPromise()
+
+        return user.data.userInfor
+    }
+
     async addMedia(idPost: any, media: any, typeMedia: string) {
         const newMedia = {
             idPost: idPost, media, typeMedia
@@ -189,12 +196,12 @@ export class PostService {
             .getOne()
 
 
-        const userCreator = await this.httpService.get(`http://localhost:2000/user/get_id/${post.idUser}`).toPromise()
+        const userCreator = await this.getUserInfor(post.idUser)
 
         return {
             isSuccess: true,
             post: post,
-            userCreator: userCreator.data.userInfor
+            userCreator: userCreator
         }
     }
 }

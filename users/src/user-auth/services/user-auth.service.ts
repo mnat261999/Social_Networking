@@ -155,13 +155,26 @@ export class UserAuthService {
         const userInfor = await this.userRespository.createQueryBuilder('user')
             .leftJoinAndSelect('user.avas', 'ava')
             .where('user.idUser = :idUser', { idUser })
-            .andWhere('ava.checkNow = :checkNow',{checkNow})
-            .select(['user.idUser', 'user.firstName', 'user.lastName', 'user.email', 'user.phone','user.role', 'user.createdAt', 'user.updatedAt', 'ava'])
+            .select(['user.idUser', 'user.firstName', 'user.lastName', 'user.email', 'user.phone', 'user.role', 'user.createdAt', 'user.updatedAt', 'ava'])
             .getOne()
+
+        if (userInfor.avas.length == 0) {
+            return {
+                isSuccess: true,
+                userInfor: userInfor
+            }
+        }
+
+        const user = await this.userRespository.createQueryBuilder('user')
+        .leftJoinAndSelect('user.avas', 'ava')
+        .where('user.idUser = :idUser', { idUser })
+        .andWhere('ava.checkNow = :checkNow', { checkNow })
+        .select(['user.idUser', 'user.firstName', 'user.lastName', 'user.email', 'user.phone', 'user.role', 'user.createdAt', 'user.updatedAt', 'ava'])
+        .getOne()
 
         return {
             isSuccess: true,
-            userInfor: userInfor
+            userInfor: user
         }
 
     }

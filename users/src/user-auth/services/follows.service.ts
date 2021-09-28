@@ -28,6 +28,12 @@ export class FollowsService {
     }
     
     async follow(idUser:any, idFollower:any){
+
+
+        if(idUser == idFollower)return{
+            isSuccess: false,
+            message:"You can't follow yourself"
+        }
     
         const result = await this.checkFollow(idUser,idFollower)
         if(result.isCheck == false) return{

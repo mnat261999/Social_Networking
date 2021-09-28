@@ -10,7 +10,6 @@ export class FollowsController {
     @Post(':id')
     async follow(@Param('id') id:string, @Res() res,@Request() req){
         try {
-            console.log(req.user)
             const result = await this.followService.follow(req.user.idUser,id)
             if(result.isSuccess==true) 
                 return res.status(HttpStatus.OK).json({newFollow:result.newFollow})
