@@ -16,7 +16,7 @@ export class PostService {
     ) { }
 
 
-    async getUserInfor(idUser: string): Promise<any>{
+    async getUserInfor(idUser: string): Promise<any> {
         const user = await this.httpService.get(`http://localhost:2000/user/get_id/${idUser}`).toPromise()
 
         return user.data.userInfor
@@ -177,7 +177,7 @@ export class PostService {
             .leftJoinAndSelect('post.medias', 'media')
             .leftJoinAndSelect('post.likes', 'like')
             .where('post.idUser = :idUser', { idUser })
-            .select(['post', 'media','like'])
+            .select(['post', 'media', 'like'])
             .getMany()
 
         return {
