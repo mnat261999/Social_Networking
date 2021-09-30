@@ -4,7 +4,6 @@ export interface Posts{
     idPost?: string;
     content?: string;
     idUser?: string;
-    reply?:[];
     medias?:Medias[];
     media?:{};
     typeMedia?:string;

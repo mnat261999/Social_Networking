@@ -3,19 +3,17 @@ import {
     CreateDateColumn,
     Entity,
     ManyToOne,
-    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 
-import { PostEntity } from 'src/post/models/entity/post.entity';
-import { ReplyEntity } from './reply.entity';
+import { CommentEntity } from './comment.entity';
 
 @Entity()
-  export class CommentEntity {
+  export class ReplyEntity {
 
     @PrimaryGeneratedColumn("uuid")
-    idComment: string;
+    idReply: string;
     
     @Column()
     content: string;
@@ -23,12 +21,9 @@ import { ReplyEntity } from './reply.entity';
     @Column()
     idUserCreator: string;
 
-    @OneToMany(type => ReplyEntity, r => r.idComment)
-    replies: ReplyEntity[];
-
-    @ManyToOne(() => PostEntity, post => post.idPost)
-    idPost: PostEntity;
-
+    @ManyToOne(() => CommentEntity, post => post.idPost)
+    idComment: CommentEntity;
+    
     @Column()
     @CreateDateColumn()
     createdAt: Date;

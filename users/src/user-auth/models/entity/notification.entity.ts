@@ -13,8 +13,14 @@ export class NotificationEntity {
     @ManyToOne(() => UserEntity, user => user.idUser)
     idUserFrom: UserEntity;
 
+    @Column("uuid")
+    idEntity: string;
+
     @Column()
     notiType: string;
+
+    @Column()
+    content: string;
 
     @Column({default: false})
     opened: boolean;

@@ -22,9 +22,6 @@ import { MediaEntity } from './media.entity';
     @Column()
     idUser: string;
 
-    @Column("simple-array", { default: null})
-    reply: []
-
     @OneToMany(type => MediaEntity, media => media.idPost)
     medias: MediaEntity[];
 
