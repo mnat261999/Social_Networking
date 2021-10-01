@@ -17,6 +17,8 @@ import { AvatarService } from './services/avatar.service';
 import { UploadService } from './services/upload.service';
 import { UploadController } from './controllers/upload.controller';
 import { AvatarController } from './controllers/avatar.controller';
+import { NotificationService } from './services/notification.service';
+import { NotificationController } from './controllers/notification.controller';
 
 
 
@@ -32,7 +34,7 @@ import { AvatarController } from './controllers/avatar.controller';
       })
     }),
   ], 
-  providers: [UserAuthService,JwtGuard, JwtStrategy, FollowsService, AvatarService, UploadService],
-  controllers: [UserAuthController, FollowsController, UploadController, AvatarController]
+  providers: [UserAuthService,JwtGuard, JwtStrategy, FollowsService, AvatarService, UploadService, NotificationService],
+  controllers: [UserAuthController, FollowsController, UploadController, AvatarController, NotificationController]
 })
 export class UserAuthModule {}

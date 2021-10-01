@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Posts } from 'src/post/models/interface/post.interface';
+import { PostService } from 'src/post/services/post.service';
 import { Repository } from 'typeorm';
 import { LikeEntity } from '../models/entity/like.entity';
 import { Likes } from '../models/interface/like.interface';
@@ -10,7 +11,8 @@ import { Likes } from '../models/interface/like.interface';
 export class LikeService {
     constructor(
         @InjectRepository(LikeEntity) private readonly likeRespository: Repository<LikeEntity>,
-        private httpService: HttpService
+        private httpService: HttpService,
+        private postService:PostService
     ) { }
 
     async findAllLike() {
@@ -21,22 +23,21 @@ export class LikeService {
     async checkLike(idPost: string, idUser: string) {
 
         const likes = await this.findAllLike()
-        console.log(likes.length)
+        //console.log(likes.length)
         if (likes.length == 0) return true
         const like = await this.likeRespository.createQueryBuilder('like')
             .leftJoinAndSelect('like.idPost', 'post')
             .where('like.idUserCreator = :idUser', { idUser })
             .andWhere('post.idPost = :idPost', { idPost })
             .getOne()
-        console.log({ like })
+        //console.log({ like })
         if (like != undefined) return false
         else return true
     }
 
     async likePost(idPost: string, idUser: string) {
 
-        console.log(idUser)
-
+    
         const check = await this.checkLike(idPost, idUser)
 
         if (check == false) return {
@@ -44,11 +45,18 @@ export class LikeService {
             message: 'This post has been liked by you'
         }
 
+        const post = await this.postService.getPostById(idPost)
+
+        const idUserFrom = post.post.idUser
+
         const newLike: any = {
             idPost: idPost, idUserCreator: idUser
         }
 
         const saveLike = await this.likeRespository.save(newLike)
+
+        this.httpService.post(`http://localhost:2000/notification`,{idUserTo:idUser,idUserFrom:idUserFrom,idEntity:idPost,notiType:"like"}).toPromise()
+
 
         return {
             isSuccess: true,

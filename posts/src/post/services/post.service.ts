@@ -191,8 +191,9 @@ export class PostService {
         console.log(idPost)
         const post = await this.postRespository.createQueryBuilder('post')
             .leftJoinAndSelect('post.medias', 'media')
+            .leftJoinAndSelect('post.likes', 'like')
             .where('post.idPost = :idPost', { idPost })
-            .select(['post', 'media'])
+            .select(['post', 'media','like'])
             .getOne()
 
 

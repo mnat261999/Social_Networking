@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FollowEntity } from '../models/entity/follow.entity';
+import { NotificationService } from './notification.service';
 
 @Injectable()
 export class FollowsService {
     constructor(
         @InjectRepository(FollowEntity) 
-        private readonly followRespository:Repository<FollowEntity>
+        private readonly followRespository:Repository<FollowEntity>,
+        private notiService: NotificationService
     ){}
 
 
@@ -44,6 +46,10 @@ export class FollowsService {
 
         const newFollow = this.followRespository.create({idUser:idUser,idFollower:idFollower})
         const saveFollow = await this.followRespository.save(newFollow)
+
+       if(saveFollow){
+            await this.notiService.insertNoti(idUser,idFollower,idUser,'follow')
+       }
 
         return{
             isSuccess: true,

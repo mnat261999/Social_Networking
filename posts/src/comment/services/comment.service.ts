@@ -3,16 +3,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CommentEntity } from '../models/entity/comment.entity';
 import { Comments } from '../models/interface/comment.interface';
-import * as bcrypt from 'bcrypt'
 import { Replies } from '../models/interface/reply.interface';
 import { ReplyEntity } from '../models/entity/reply.entity';
+import { HttpService } from '@nestjs/axios';
+import { PostService } from 'src/post/services/post.service';
 
 
 @Injectable()
 export class CommentService {
     constructor(
         @InjectRepository(CommentEntity) private readonly commentRespository: Repository<CommentEntity>,
-        @InjectRepository(ReplyEntity) private readonly replyRespository: Repository<ReplyEntity>
+        @InjectRepository(ReplyEntity) private readonly replyRespository: Repository<ReplyEntity>,
+        private httpService: HttpService,
+        private postService:PostService
     ) { }
 
     async validateUser(id: string, idUser:string,type:string) {
@@ -41,7 +44,13 @@ export class CommentService {
             content: content, idUserCreator: idUserCreator, idPost: idPost
         }
 
+        const post = await this.postService.getPostById(idPost)
+
+        const idUserFrom = post.post.idUser
+
         const saveComment = await this.commentRespository.save(newComment)
+
+        this.httpService.post(`http://localhost:2000/notification`,{idUserTo:idUserCreator,idUserFrom:idUserFrom,idEntity:idPost,notiType:"comment"}).toPromise()
 
         return {
             isSuccess: true,

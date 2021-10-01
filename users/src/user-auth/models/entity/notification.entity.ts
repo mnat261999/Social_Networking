@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UserEntity } from "./user.entity";
 
 @Entity()
@@ -19,10 +19,18 @@ export class NotificationEntity {
     @Column()
     notiType: string;
 
-    @Column()
-    content: string;
+/*     @Column()
+    content: string; */
 
     @Column({default: false})
     opened: boolean;
+
+    @Column()
+    @CreateDateColumn()
+    createdAt: Date;
+  
+    @Column()
+    @UpdateDateColumn()
+    updatedAt: Date;
 
 }

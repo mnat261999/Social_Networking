@@ -5,11 +5,13 @@ import { CommentEntity } from './models/entity/comment.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
 import { ReplyEntity } from './models/entity/reply.entity';
+import { PostModule } from 'src/post/post.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([CommentEntity,ReplyEntity]),
-    HttpModule
+    HttpModule,
+    PostModule
   ], 
   providers: [CommentService],
   controllers: [CommentController],
