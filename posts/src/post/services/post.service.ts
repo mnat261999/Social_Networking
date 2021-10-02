@@ -69,7 +69,12 @@ export class PostService {
     }
 
     async findAllPosts() {
-        return await this.postRespository.find()
+        return await this.postRespository.createQueryBuilder('post')
+                                         .leftJoinAndSelect('post.medias','media')
+                                         .leftJoinAndSelect('post.likes','like')
+                                         .leftJoinAndSelect('post.comments','co')
+                                         .select(['post','media','like','co'])
+                                         .getMany()
     }
 
     async updatePostContent(idPost: string, post: Posts, user: any) {

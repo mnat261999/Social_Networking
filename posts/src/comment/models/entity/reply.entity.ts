@@ -21,7 +21,7 @@ import { CommentEntity } from './comment.entity';
     @Column()
     idUserCreator: string;
 
-    @ManyToOne(() => CommentEntity, post => post.idPost)
+    @ManyToOne(() => CommentEntity, post => post.idPost,{onDelete: 'CASCADE'})
     idComment: CommentEntity;
     
     @Column()

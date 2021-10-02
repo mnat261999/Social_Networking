@@ -46,11 +46,11 @@ export class CommentService {
 
         const post = await this.postService.getPostById(idPost)
 
-        const idUserFrom = post.post.idUser
+        const idUserTo = post.post.idUser
 
         const saveComment = await this.commentRespository.save(newComment)
 
-        this.httpService.post(`http://localhost:2000/notification`,{idUserTo:idUserCreator,idUserFrom:idUserFrom,idEntity:idPost,notiType:"comment"}).toPromise()
+        this.httpService.post(`http://localhost:2000/notification`,{idUserTo:idUserTo,idUserFrom:idUserCreator,idEntity:idPost,notiType:"comment"}).toPromise()
 
         return {
             isSuccess: true,

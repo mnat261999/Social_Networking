@@ -47,7 +47,7 @@ export class LikeService {
 
         const post = await this.postService.getPostById(idPost)
 
-        const idUserFrom = post.post.idUser
+        const idUserTo = post.post.idUser
 
         const newLike: any = {
             idPost: idPost, idUserCreator: idUser
@@ -55,7 +55,7 @@ export class LikeService {
 
         const saveLike = await this.likeRespository.save(newLike)
 
-        this.httpService.post(`http://localhost:2000/notification`,{idUserTo:idUser,idUserFrom:idUserFrom,idEntity:idPost,notiType:"like"}).toPromise()
+        this.httpService.post(`http://localhost:2000/notification`,{idUserTo:idUserTo,idUserFrom:idUser,idEntity:idPost,notiType:"like"}).toPromise()
 
 
         return {

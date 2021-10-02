@@ -8,10 +8,10 @@ export class NotificationEntity {
     idNoti: string;
     
     @ManyToOne(() => UserEntity, user => user.idUser)
-    idUserTo: UserEntity;
+    idUserTo: UserEntity;//user nhận
 
     @ManyToOne(() => UserEntity, user => user.idUser)
-    idUserFrom: UserEntity;
+    idUserFrom: UserEntity;//user gửi
 
     @Column("uuid")
     idEntity: string;

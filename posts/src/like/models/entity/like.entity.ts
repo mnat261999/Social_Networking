@@ -18,7 +18,7 @@ import { PostEntity } from 'src/post/models/entity/post.entity';
     @Column()
     idUserCreator: string;
 
-    @ManyToOne(() => PostEntity, post => post.idPost)
+    @ManyToOne(() => PostEntity, post => post.idPost,{onDelete: 'CASCADE'})
     idPost: PostEntity;
 
     @Column()

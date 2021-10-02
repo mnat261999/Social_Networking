@@ -48,7 +48,7 @@ export class FollowsService {
         const saveFollow = await this.followRespository.save(newFollow)
 
        if(saveFollow){
-            await this.notiService.insertNoti(idUser,idFollower,idUser,'follow')
+            await this.notiService.insertNoti(idFollower,idUser,idUser,'follow')
        }
 
         return{

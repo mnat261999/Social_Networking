@@ -26,7 +26,7 @@ import { ReplyEntity } from './reply.entity';
     @OneToMany(type => ReplyEntity, r => r.idComment)
     replies: ReplyEntity[];
 
-    @ManyToOne(() => PostEntity, post => post.idPost)
+    @ManyToOne(() => PostEntity, post => post.idPost,{onDelete: 'CASCADE'})
     idPost: PostEntity;
 
     @Column()
