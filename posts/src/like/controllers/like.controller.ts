@@ -10,9 +10,10 @@ export class LikeController {
     @Post(':id')
     async follow(@Param('id') id: string, @Res() res, @Request() req) {
         try {
+            console.log(req.user.idUser)
             const result = await this.likeService.likePost(id, req.user.idUser)
             if (result.isSuccess == true)
-                return res.status(HttpStatus.OK).json({ newFollow: result.newLike })
+                return res.status(HttpStatus.OK).json({ newLike: result.newLike })
             else if (result.isSuccess == false)
                 return res.status(HttpStatus.BAD_REQUEST).json({ msg: result.message })
         } catch (err) {

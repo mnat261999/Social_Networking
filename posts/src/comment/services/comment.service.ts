@@ -20,14 +20,23 @@ export class CommentService {
 
     async validateUser(id: string, idUser:string,type:string) {
         if(type == 'comment'){
-            const check = await this.commentRespository.findOne({idComment:id})
-            console.log(check)
+            const check = await this.commentRespository.findOne(id)
+
+            //console.log(check)
+
+            //console.log({idUser},check.idUserCreator)
             if (check.idUserCreator != idUser)
-                return false
+                {
+                    //console.log('false')
+                    return false
+                }
             else
-                return true
+                {
+                    //console.log('true')
+                    return true
+                }
         } else if(type == "reply"){
-            const check = await this.replyRespository.findOne({idReply:id})
+            const check = await this.replyRespository.findOne(id)
             console.log(check)
             if (check.idUserCreator != idUser)
                 return false
@@ -128,17 +137,26 @@ export class CommentService {
     }
 
     async deleteComment(idComment: string,idUserCreator:string) {
+        console.log({idComment},{idUserCreator})
         const check = await this.validateUser(idComment,idUserCreator,'comment')
+
+        console.log(check)
 
         if(check == false) return{
             isSuccess: false,
             message:'You can only delete comments created by you'
         }
         else{
-            await this.commentRespository.delete(idComment)
+            const test = await this.commentRespository.createQueryBuilder()
+                                        .delete()
+                                        .where("idComment = :idComment", {idComment})
+                                        .execute();
+
+
+            console.log({test})
 
             return{
-                isSuccess: false,
+                isSuccess: true,
                 message:'Delete success'
             }
         }

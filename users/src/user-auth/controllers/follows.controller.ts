@@ -20,11 +20,10 @@ export class FollowsController {
         }
     }
 
-    @UseGuards(JwtGuard)
-    @Get('following_list')
-    async listFollowing(@Res() res,@Request() req){
+    @Get('following_list/:id')
+    async listFollowing(@Param('id') id:string,@Res() res,@Request() req){
         try {
-            const result = await this.followService.getListFollowByUser(req.user.idUser)
+            const result = await this.followService.getListFollowByUser(id)
             if(result.isSuccess==true) 
                 return res.status(HttpStatus.OK).json({
                     following:result.following,

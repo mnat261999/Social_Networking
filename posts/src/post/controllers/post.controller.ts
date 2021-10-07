@@ -1,10 +1,11 @@
-import { Body, Controller, Post, UseGuards,Request, Res, HttpStatus, Get, Put, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards,Request, Res, HttpStatus, Get, Put, Param, Delete, Query } from '@nestjs/common';
 import { Roles } from '../decorators/roles.decorator';
 import { JwtGuard } from '../guards/jwt.guard';
 import { Role } from '../guards/role.enum';
 import { RolesGuard } from '../guards/roles.guard';
 import { MediaDto } from '../models/dto/media.dto';
 import { PostDto } from '../models/dto/post.dto';
+import { Posts } from '../models/interface/post.interface';
 import { PostService } from '../services/post.service';
 
 @Controller('post')
@@ -31,8 +32,17 @@ export class PostController {
     }
 
     @Get('getall')
-    async findAllPost(){
-        return this.postService.findAllPosts()
+    async findAllPost(@Query() query:any, @Res() res){
+       try {
+        const result = await this.postService.findAllPosts(query)
+        return res.status(HttpStatus.OK).json({
+            posts:result.posts,
+            total: result.total,
+            result: result.result
+        });
+       } catch (err) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
+       }
     }
 
     @UseGuards(JwtGuard)
@@ -52,7 +62,7 @@ export class PostController {
 
     @UseGuards(JwtGuard)
     @Put('update_media/:id')
-    async updatePostImage(@Param('id') id:string,@Body() media:MediaDto,@Res() res,@Request() req){
+    async updatePostImage(@Param('id') id:string,@Body() media:Posts,@Res() res,@Request() req){
         try {
             
             const result = await this.postService.updatePostMedia(id,media,req.user)

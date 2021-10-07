@@ -10,21 +10,28 @@ export class UserAuthController {
     
     @Post('register')
     async register(@Body() user:UserDto,@Res() res){
-        const result = await this.userService.register(user)
-        if(result.isSuccess){
-            res.status(HttpStatus.OK).json({msg:result.message});
-        }else{
-            return result
+        try {
+            const result = await this.userService.register(user)
+            if(result.isSuccess==true){
+                return res.status(HttpStatus.OK).json({msg:result.message});
+            }else if(result.isSuccess == false){
+                return res.status(HttpStatus.BAD_REQUEST).json({msg:result.message});
+            }
+        } catch (err) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
         }
     }
 
     @Post('activation')
     async  activateEmail(@Body('activate_token') body,@Res() res){
-        const result = await this.userService.activationEmail(body)
-        if(result.isSuccess){
-            res.status(HttpStatus.OK).json({msg:result.message});
-        }else{
-            return result
+        try {
+            console.log(body)
+            const result = await this.userService.activationEmail(body)
+            if(result.isSuccess==true){
+                return res.status(HttpStatus.OK).json({msg:result.message});
+            }
+        } catch (err) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
         }
     }
     @Post('login')
@@ -70,11 +77,22 @@ export class UserAuthController {
         res.status(HttpStatus.OK).json({msg: 'Logout!'})
     }
 
+    @UseGuards(JwtGuard)
+    @Get('all_user')
+    async findAllByUser(@Res() res,@Request() req){
+        try {
+            const result = await this.userService.findAllByUser(req.user.idUser)
+            if(result.isSuccess) return res.status(HttpStatus.OK).json({userList:result.users})
+        } catch (err) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
+        }
+    }
+
     @Get('all')
     async findAll(@Res() res){
         try {
             const result = await this.userService.findAll()
-            if(result.isSuccess) return res.status(HttpStatus.OK).json({userList:result.users})
+            return res.status(HttpStatus.OK).json({userList:result})
         } catch (err) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
         }

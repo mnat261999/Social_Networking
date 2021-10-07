@@ -62,4 +62,17 @@ export class NotificationService {
             mark
         }
     }
+
+/*     async deleteNoti(idUserTo:string){
+        const mark = await this.notiRespository.createQueryBuilder()
+        .update()
+        .set({opened:true})
+        .where('idUserTo = :idUserTo',{idUserTo})
+        .execute()
+
+        return {
+            isSuccess:true,
+            mark
+        }
+    } */
 }

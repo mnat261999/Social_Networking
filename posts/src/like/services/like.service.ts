@@ -65,6 +65,7 @@ export class LikeService {
     }
 
     async unLike(idPost: string, idUser: string) {
+        console.log(idUser)
         const like = await this.likeRespository.createQueryBuilder('like')
                                                 .leftJoinAndSelect('like.idPost', 'post')
                                                 .where('like.idUserCreator = :idUser', { idUser })

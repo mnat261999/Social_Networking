@@ -62,7 +62,8 @@ export class FollowsService {
         const following = await this.followRespository.createQueryBuilder('following')
                                                       .leftJoinAndSelect("following.idFollower", "user")
                                                       .where('following.idUser = :idUser', {idUser})
-                                                      .select(['following','user'])
+                                                      .leftJoinAndSelect("user.avas", "ava")
+                                                      .select(['following','user','ava'])
                                                       .getMany();
         const follower = await this.followRespository.createQueryBuilder('following')
                                                      .leftJoinAndSelect("following.idUser", "user")
@@ -79,6 +80,7 @@ export class FollowsService {
     }
 
     async cancelFollow(idUser:any, idFollowCancel:any){
+        
         const follow = await this.followRespository.createQueryBuilder('follow')
                                                    .where('follow.idUser = :idUser', {idUser})
                                                    .andWhere('follow.idFollower = :idFollowCancel',{idFollowCancel})
@@ -87,8 +89,8 @@ export class FollowsService {
         if(follow == undefined) return {
             isSuccess: true,
             message:"You haven't followed this user yet"
-        }
-        const idFollow = follow.idFollow
+        } 
+    const idFollow = follow.idFollow 
         await this.followRespository.createQueryBuilder()
                                     .delete()
                                     .where("idFollow = :idFollow",{idFollow})

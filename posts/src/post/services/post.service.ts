@@ -32,8 +32,10 @@ export class PostService {
 
 
     async validateUserPost(idPost: string, user: any) {
+/*         console.log(user)
+        console.log(idPost) */
         const postCheck = await this.postRespository.findOne({ idPost })
-        console.log(postCheck)
+        
         if (postCheck.idUser != user.idUser)
             return { isCheck: false }
         else
@@ -45,36 +47,55 @@ export class PostService {
 
 
     async createPost(post: Posts, user: any) {
-        console.log(post)
-        const { content, media, typeMedia } = post
-
+        
+        const { content, media} = post
+        //console.log(post.media.length)
         const newPost: any = {
             content, idUser: user.idUser
         }
-        const savePost = await this.postRespository.save(newPost)
+        const savePost = await this.postRespository.save(newPost) 
 
-        if (media != undefined) {
-            await this.addMedia(savePost.idPost, media, typeMedia)
-            /*             const newMedia = {
-                            idPost:savePost.idPost,media,typeMedia
-                        }
-                
-                        await this.mediaRespository.save(newMedia) */
+          if (post.media.length > 0) {
+              post.media.map(async _ =>{
+                await this.addMedia(savePost.idPost, _.media, _.typeMedia)
+            })
+            
         }
-        return {
+          return {
             isSuccess: true,
             message: 'Create success',
             newPost: savePost
-        }
+        } 
     }
 
-    async findAllPosts() {
-        return await this.postRespository.createQueryBuilder('post')
+    async findAllPosts(query:any) {
+
+        const all = await this.postRespository.find()
+
+        const page = query.page * 1 || 1
+
+        console.log(page)
+        const limit = query.limit * 1 || 3
+
+        console.log(limit)
+        const skip = (page - 1) * limit;
+        const posts =  await this.postRespository.createQueryBuilder('post')
                                          .leftJoinAndSelect('post.medias','media')
                                          .leftJoinAndSelect('post.likes','like')
                                          .leftJoinAndSelect('post.comments','co')
-                                         .select(['post','media','like','co'])
+                                         .leftJoinAndSelect('co.replies','re')
+                                         .select(['post','media','like','co','re'])
+/*                                           .orderBy('post.createdAt', 'DESC')*/
+                                         .skip(skip)
+                                         .take(limit)
+                                         .orderBy('post.createdAt', 'DESC')
                                          .getMany()
+
+        return {
+            posts:posts,
+            total:all.length,
+            result:posts.length
+        }
     }
 
     async updatePostContent(idPost: string, post: Posts, user: any) {
@@ -98,7 +119,9 @@ export class PostService {
         }
     }
 
-    async updatePostMedia(idPost: any, medias: Medias, user: any) {
+    async updatePostMedia(idPost: any, medias: Posts, user: any) {
+
+        console.log(medias.media)
 
         const result = await this.validateUserPost(idPost, user)
 
@@ -107,9 +130,16 @@ export class PostService {
             message: 'You can only edit posts created by you'
         }
 
-        const { media, typeMedia } = medias
+/*         const { media, typeMedia } = medias
 
-        await this.addMedia(idPost, media, typeMedia)
+        await this.addMedia(idPost, media, typeMedia) */
+
+        if (medias.media.length > 0) {
+            medias.media.map(async _ =>{
+              await this.addMedia(idPost, _.media, _.typeMedia)
+          })
+          
+      }
 
         const dateTime = new Date();
 

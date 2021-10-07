@@ -7,7 +7,7 @@ import { FollowEntity } from "./follow.entity";
 
 
 @Entity()
-@Unique(['email', 'phone'])
+@Unique(['email'])
 export class UserEntity{
     @PrimaryGeneratedColumn("uuid")
     idUser: string;

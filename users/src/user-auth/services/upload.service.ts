@@ -14,41 +14,41 @@ cloudinary.config({
 @Injectable()
 export class UploadService {
 
-    async validateType(file: Express.Multer.File){
-      console.log(file)
-        if(file.mimetype !== 'image/jpeg' && file.mimetype !== 'image/png'){
-            return {isCheck:false}
-        } else return {isCheck:true}
+    async validateType(file: Express.Multer.File) {
+        console.log(file)
+        if (file.mimetype !== 'image/jpeg' && file.mimetype !== 'image/png') {
+            return { isCheck: false }
+        } else return { isCheck: true }
     }
 
     async uploadAvatarUser(
         file: Express.Multer.File,
-      ): Promise<UploadApiResponse | UploadApiErrorResponse> {
-        
+    ): Promise<UploadApiResponse | UploadApiErrorResponse> {
+
         return new Promise((resolve, reject) => {
-          const upload = cloudinary.v2.uploader.upload_stream({folder: "avatar_social"},(error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-          });
-        
-          toStream(file.buffer).pipe(upload);
+            const upload = cloudinary.v2.uploader.upload_stream({ folder: "avatar_social", width: 150, height: 150, crop: "fill" }, (error, result) => {
+                if (error) return reject(error);
+                resolve(result);
+            });
+
+            toStream(file.buffer).pipe(upload);
 
         });
-      }
-    
-    async uploadAvatar(file:Express.Multer.File){
+    }
+
+    async uploadAvatar(file: Express.Multer.File) {
         const check = await this.validateType(file)
 
-        if(check.isCheck == false) return {
-            isSuccess:false,
-            msg:'File format is incorrect.'
+        if (check.isCheck == false) return {
+            isSuccess: false,
+            msg: 'File format is incorrect.'
         }
-        
+
         const result = await this.uploadAvatarUser(file)
-        return{
-            isSuccess:true,
-            public_id:result.public_id,
-            url:result.secure_url
+        return {
+            isSuccess: true,
+            public_id: result.public_id,
+            url: result.secure_url
         }
     }
 }

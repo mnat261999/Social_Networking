@@ -22,11 +22,10 @@ export class AvatarController {
         }
     }
 
-    @UseGuards(JwtGuard)
-    @Get()
-    async getAvatarByUser(@Res() res,@Request() req){
+    @Get(':id')
+    async getAvatarByUser(@Param('id') id:string,@Res() res,@Request() req){
         try {
-            const result = await this.avatarService.getAvatarByUser(req.user.idUser)
+            const result = await this.avatarService.getAvatarByUser(id)
             if(result.isSuccess==true) 
                 return res.status(HttpStatus.OK).json({
                     avaCurrent:result.avaCurrent,

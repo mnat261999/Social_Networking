@@ -6,6 +6,9 @@ import { UserEntity } from '../models/entity/user.entity';
 import * as bcrypt from 'bcrypt'
 import { Users } from '../models/interface/user.interface';
 import { sendEmail } from '../utils/sendEmail';
+import { FollowsService } from './follows.service';
+import { FollowEntity } from '../models/entity/follow.entity';
+import { compareArr } from '../utils/checkArr';
 
 
 @Injectable()
@@ -13,17 +16,30 @@ export class UserAuthService {
     constructor(
         @InjectRepository(UserEntity)
         private readonly userRespository: Repository<UserEntity>,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        @InjectRepository(FollowEntity)
+        private readonly followRespository: Repository<FollowEntity>
+
     ) { }
 
     async register(user: Users) {
         const { firstName, lastName, email, phone, password } = user
+
+        const find = await this.userRespository.findOne({ email: email })
+
+        if (find != undefined) return {
+            isSuccess: false,
+            message: 'This email does exist'
+        }
+
+
+
         const passwordHash = await bcrypt.hash(password, 12)
         const newUser = {
             firstName, lastName, email, phone, password: passwordHash
         }
         const activation_token = this.jwtService.sign(newUser)
-        const url = `http://localhost:8080/user/activate/${activation_token}`
+        const url = `http://localhost:3000/user/activate/${activation_token}`
         sendEmail(email, url, "Verify your email address")
         return {
             isSuccess: true,
@@ -116,12 +132,44 @@ export class UserAuthService {
         }
     }
 
-    async findAll() {
-        const users = await this.userRespository.find()
+    async findAllByUser(idUser: string) {
+        /* const users = await this.userRespository.find() */
+
+        const users = await this.userRespository.createQueryBuilder('user')
+                                    .leftJoinAndSelect('user.avas','ava')
+                                    .select(['user', 'ava'])
+                                    .getMany()
+        let userFollow = []
+
+        const following = await this.followRespository.createQueryBuilder('following')
+            .leftJoinAndSelect("following.idFollower", "user")
+            .where('following.idUser = :idUser', { idUser })
+            .select(['following', 'user'])
+            .getMany();
+
+
+        following.map(_ => {
+            userFollow.push(_.idFollower)
+        })
+
+        var onlyInA = users.filter(compareArr(userFollow));
+        var onlyInB = userFollow.filter(compareArr(users));
+
+
+        const result = onlyInA.concat(onlyInB);
+
+        const userList = result.filter(_ => _.idUser != idUser);
+
         return {
             isSuccess: true,
-            users: users
+            users: userList
         }
+    }
+
+    async findAll() {
+        return await this.userRespository.find({
+            relations: ['avas']
+        })
     }
 
     async getUserInfor(idUser: string) {
@@ -130,15 +178,31 @@ export class UserAuthService {
                     where: {idUser:idUser},
                   }) */
 
+        const checkNow = true
+
         const userInfor = await this.userRespository.createQueryBuilder('user')
             .leftJoinAndSelect('user.avas', 'ava')
             .where('user.idUser = :idUser', { idUser })
-            .select(['user.idUser', 'user.firstName', 'user.lastName', 'user.email', 'user.phone', 'user.password', 'user.role', 'user.createdAt', 'user.updatedAt', 'ava'])
+            .select(['user.idUser', 'user.firstName', 'user.lastName', 'user.email', 'user.phone', 'user.role', 'user.createdAt', 'user.updatedAt', 'ava'])
+            .getOne()
+
+        if (userInfor.avas.length == 0) {
+            return {
+                isSuccess: true,
+                userInfor: userInfor
+            }
+        }
+
+        const user = await this.userRespository.createQueryBuilder('user')
+            .leftJoinAndSelect('user.avas', 'ava')
+            .where('user.idUser = :idUser', { idUser })
+            .andWhere('ava.checkNow = :checkNow', { checkNow })
+            .select(['user.idUser', 'user.firstName', 'user.lastName', 'user.email', 'user.phone', 'user.role', 'user.createdAt', 'user.updatedAt', 'ava'])
             .getOne()
 
         return {
             isSuccess: true,
-            userInfor: userInfor
+            userInfor: user
         }
 
     }
@@ -166,11 +230,11 @@ export class UserAuthService {
         }
 
         const user = await this.userRespository.createQueryBuilder('user')
-        .leftJoinAndSelect('user.avas', 'ava')
-        .where('user.idUser = :idUser', { idUser })
-        .andWhere('ava.checkNow = :checkNow', { checkNow })
-        .select(['user.idUser', 'user.firstName', 'user.lastName', 'user.email', 'user.phone', 'user.role', 'user.createdAt', 'user.updatedAt', 'ava'])
-        .getOne()
+            .leftJoinAndSelect('user.avas', 'ava')
+            .where('user.idUser = :idUser', { idUser })
+            .andWhere('ava.checkNow = :checkNow', { checkNow })
+            .select(['user.idUser', 'user.firstName', 'user.lastName', 'user.email', 'user.phone', 'user.role', 'user.createdAt', 'user.updatedAt', 'ava'])
+            .getOne()
 
         return {
             isSuccess: true,
