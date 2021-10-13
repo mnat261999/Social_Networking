@@ -1,8 +1,10 @@
 import {
     Column,
+    CreateDateColumn,
     Entity,
     ManyToOne,
     PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 
 import { PostEntity } from './post.entity';
@@ -21,5 +23,13 @@ import { PostEntity } from './post.entity';
 
     @Column()
     typeMedia: string;
+
+    @Column()
+    @CreateDateColumn()
+    createdAt: Date;
+  
+    @Column()
+    @UpdateDateColumn()
+    updatedAt: Date;
 
 }

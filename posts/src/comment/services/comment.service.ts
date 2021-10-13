@@ -22,17 +22,14 @@ export class CommentService {
         if(type == 'comment'){
             const check = await this.commentRespository.findOne(id)
 
-            //console.log(check)
 
-            //console.log({idUser},check.idUserCreator)
             if (check.idUserCreator != idUser)
                 {
-                    //console.log('false')
+
                     return false
                 }
             else
                 {
-                    //console.log('true')
                     return true
                 }
         } else if(type == "reply"){
@@ -114,6 +111,8 @@ export class CommentService {
             .where('idComment = :idComment', { idComment })
             .andWhere('idUserCreator = :idUserCreator',{idUserCreator})
             .execute()
+        
+        //console.log({update})
 
         return {
             isSuccess: true,
@@ -137,10 +136,10 @@ export class CommentService {
     }
 
     async deleteComment(idComment: string,idUserCreator:string) {
-        console.log({idComment},{idUserCreator})
+        //console.log({idComment},{idUserCreator})
         const check = await this.validateUser(idComment,idUserCreator,'comment')
 
-        console.log(check)
+        //console.log(check)
 
         if(check == false) return{
             isSuccess: false,
@@ -153,7 +152,7 @@ export class CommentService {
                                         .execute();
 
 
-            console.log({test})
+            //console.log({test})
 
             return{
                 isSuccess: true,
@@ -165,6 +164,7 @@ export class CommentService {
     async deleteReply(idReply: string,idUserCreator:string) {
         const check = await this.validateUser(idReply,idUserCreator,'reply')
 
+
         if(check == false) return{
             isSuccess: false,
             message:'You can only delete reply created by you'
@@ -173,7 +173,7 @@ export class CommentService {
             await this.replyRespository.delete(idReply)
 
             return{
-                isSuccess: false,
+                isSuccess: true,
                 message:'Delete success'
             }
         }

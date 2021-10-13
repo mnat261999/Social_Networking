@@ -1,6 +1,6 @@
 import { Body, Controller, HttpStatus, Post, Res, UseGuards, Request, Param, Get, Put } from '@nestjs/common';
 import { JwtGuard } from '../guards/jwt.guard';
-import { UserDto } from '../models/dto/user.dto';
+import { UserDto, UserUpdateDto } from '../models/dto/user.dto';
 import { UserAuthService } from '../services/user-auth.service';
 import { Response } from 'express';
 
@@ -120,6 +120,17 @@ export class UserAuthController {
             if(result.isSuccess) return res.status(HttpStatus.OK).json({
                 userInfor:result.userInfor
             })
+        } catch (err) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
+        }
+    }
+
+    @UseGuards(JwtGuard)
+    @Put('update')
+    async updateUser(@Body() user:UserUpdateDto, @Res() res, @Request() req){
+        try {
+            const result = await this.userService.updateUser(req.user.idUser, user)
+            if(result.isSuccess == true) return res.status(HttpStatus.OK).json(result.update)
         } catch (err) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
         }

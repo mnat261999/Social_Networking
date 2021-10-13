@@ -6,7 +6,6 @@ import { UserEntity } from '../models/entity/user.entity';
 import * as bcrypt from 'bcrypt'
 import { Users } from '../models/interface/user.interface';
 import { sendEmail } from '../utils/sendEmail';
-import { FollowsService } from './follows.service';
 import { FollowEntity } from '../models/entity/follow.entity';
 import { compareArr } from '../utils/checkArr';
 
@@ -241,6 +240,23 @@ export class UserAuthService {
             userInfor: user
         }
 
+    }
+
+    async updateUser(idUser: string, user:Users){
+        //console.log(user)
+        const {firstName, lastName, phone} = user
+
+        const update = await this.userRespository.createQueryBuilder()
+        .update()
+        .set({firstName,lastName,phone})
+        .where("idUser = :idUser", {idUser})
+        .execute();
+
+        console.log(update)
+        return {
+            isSuccess: true,
+            update
+        }
     }
 
 }

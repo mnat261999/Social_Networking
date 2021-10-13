@@ -74,10 +74,10 @@ export class PostService {
 
         const page = query.page * 1 || 1
 
-        console.log(page)
+        //console.log(page)
         const limit = query.limit * 1 || 3
 
-        console.log(limit)
+        //console.log(limit)
         const skip = (page - 1) * limit;
         const posts =  await this.postRespository.createQueryBuilder('post')
                                          .leftJoinAndSelect('post.medias','media')
@@ -208,12 +208,17 @@ export class PostService {
 
     async groupPostByUser(idUser: string) {
 
+        //console.log(idUser)
+
         const listPosts = await this.postRespository.createQueryBuilder('post')
             .leftJoinAndSelect('post.medias', 'media')
             .leftJoinAndSelect('post.likes', 'like')
+            .leftJoinAndSelect('post.comments', 'comment')
             .where('post.idUser = :idUser', { idUser })
-            .select(['post', 'media', 'like'])
+            .select(['post', 'media', 'like','comment'])
             .getMany()
+
+            //console.log(listPosts)
 
         return {
             isSuccess: true,
@@ -223,13 +228,15 @@ export class PostService {
     }
 
     async getPostById(idPost: string): Promise<any> {
-        console.log(idPost)
+        //console.log(idPost)
         const post = await this.postRespository.createQueryBuilder('post')
             .leftJoinAndSelect('post.medias', 'media')
             .leftJoinAndSelect('post.likes', 'like')
             .where('post.idPost = :idPost', { idPost })
             .select(['post', 'media','like'])
             .getOne()
+
+        //console.log(post)
 
 
         const userCreator = await this.getUserInfor(post.idUser)

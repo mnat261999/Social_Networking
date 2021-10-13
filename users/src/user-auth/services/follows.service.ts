@@ -68,7 +68,8 @@ export class FollowsService {
         const follower = await this.followRespository.createQueryBuilder('following')
                                                      .leftJoinAndSelect("following.idUser", "user")
                                                      .where('following.idFollower = :idUser', {idUser})
-                                                     .select(['following','user'])
+                                                     .leftJoinAndSelect("user.avas", "ava")
+                                                     .select(['following','user','ava'])
                                                      .getMany();
         return{
             isSuccess: true,

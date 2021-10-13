@@ -111,14 +111,14 @@ export class PostController {
     }
 
     @UseGuards(JwtGuard)
-    @Get('listByUser')
-    async groupPostByUser(@Res() res,@Request() req){
+    @Get('listByUser/:id')
+    async groupPostByUser(@Param('id') id:string,@Res() res,@Request() req){
         try {
 
-            const result = await this.postService.groupPostByUser(req.user.idUser)
+            const result = await this.postService.groupPostByUser(id)
 
             if(result.isSuccess==true)
-                return res.status(HttpStatus.BAD_REQUEST).json({listPosts:result.listPosts});
+                return res.status(HttpStatus.OK).json({listPosts:result.listPosts});
         } catch (err) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
         }
