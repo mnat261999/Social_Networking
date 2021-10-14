@@ -106,7 +106,7 @@ export class UserAuthService {
         }
         const reset_token = this.jwtService.sign({ user })
 
-        const url = `http://localhost:8080/user/reset/${reset_token}`
+        const url = `http://localhost:3000/user/reset/${reset_token}`
 
         sendEmail(email, url, "Reset your password")
 

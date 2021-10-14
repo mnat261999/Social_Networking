@@ -73,6 +73,16 @@ export class CommentService {
 
         const newReply = await this.replyRespository.save(createReply)
 
+        const post = await this.commentRespository.createQueryBuilder('co')
+                                                .leftJoinAndSelect('co.idPost','post')
+                                                .where("co.idComment = :idComment", { idComment })
+                                                .select(['co', 'post.idPost', 'post.idUser'])
+                                                .getOne()
+        const idPost = post.idPost.idPost
+        const idUserTo = post.idPost.idUser
+
+        this.httpService.post(`http://localhost:2000/notification`,{idUserTo:idUserTo,idUserFrom:idUserCreator,idEntity:idPost,notiType:"reply"}).toPromise()
+
         return {
             isSuccess: true,
             newReply

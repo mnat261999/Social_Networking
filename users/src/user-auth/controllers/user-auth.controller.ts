@@ -39,7 +39,7 @@ export class UserAuthController {
         const result:any = await this.userService.login(user)
 
         if(result.isCheck== false){
-            res.status(HttpStatus.BAD_REQUEST).json({msg:result.message})
+            res.json({msg:result.message})
         }else{
             res.cookie('tokenauthen',result.token,{
                 httpOnly:true
@@ -56,18 +56,22 @@ export class UserAuthController {
     @Post('forgot')
     async fogotPassword(@Body('email') email, @Res() res){
         const result = await this.userService.forgotPassword(email)
-        if(result.isSuccess == false) return res.status(HttpStatus.BAD_REQUEST).json({msg:result.message})
+        if(result.isSuccess == false) return res.json({msg:result.message})
         else return res.status(HttpStatus.OK).json({msg:result.message})
     }
 
     @UseGuards(JwtGuard)
     @Post('reset')
     async resetPassword(@Body('password') password, @Request() req, @Res() res){
-        const result = await this.userService.resetPassword(password,req.user.idUser)
-        if(result.isSuccess){
-            res.status(HttpStatus.OK).json({msg:result.message});
-        }else{
-            return result
+        try {
+            const result = await this.userService.resetPassword(password,req.user.idUser)
+            if(result.isSuccess == true){
+                return res.status(HttpStatus.OK).json({msg:result.message});
+            }else if(result.isSuccess == false){
+                return res.json({msg:result.message});
+            }
+        } catch (err) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({msg: err.message})
         }
     }
 
