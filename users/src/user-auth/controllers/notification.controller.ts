@@ -55,4 +55,20 @@ export class NotificationController {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ msg: err.message })
         }
     }
+
+    @UseGuards(JwtGuard)
+    @Get('getbyuser')
+    async getNotiByUser(@Res() res,@Request() req) {
+        try {
+            const result = await this.notiService.getNotiByUser(req.user.idUser)
+            if (result.isSuccess == true)
+                return res.status(HttpStatus.OK).json({
+                    listNoti: result.notis,
+                    listNotiNotMark: result.notisFalse,
+                    listNotiNotMarkTotal: result.notisFalse.length
+                })
+        } catch (err) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ msg: err.message })
+        }
+    }
 }
